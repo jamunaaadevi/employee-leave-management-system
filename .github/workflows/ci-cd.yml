@@ -1,0 +1,44 @@
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  # ── Job 1: runs on every push and PR ──────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pytest tests/ -v
+      - run: docker build -t elms-test .   # proves the Dockerfile is valid
+
+  # ── Job 2: only on push to main, after test passes ────────────────────────
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      IMG: asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/elms-repo/leave-management:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+      - run: docker build -t $IMG . && docker push $IMG
+      - run: |
+          gcloud run deploy leave-management \
+            --image $IMG --region asia-south1 \
+            --platform managed --allow-unauthenticated
+      - name: Smoke test
+        run: |
+          URL=$(gcloud run services describe leave-management \
+            --region asia-south1 --format 'value(status.url)')
+          curl -f "$URL/health"

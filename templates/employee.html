@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard – ELMS</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <div class="container bar">
+    <strong>Welcome, {{ username }}</strong>
+    <a href="/logout">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <p>Leave Balance: <strong>{{ balance }} days</strong> remaining out of 20</p>
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  <h3>Apply for Leave</h3>
+  <form method="post" action="/apply">
+    <label>Leave Type
+      <select name="type">
+        <option>Sick Leave</option>
+        <option>Casual Leave</option>
+        <option>Annual Leave</option>
+      </select>
+    </label>
+    <label>Start Date <input type="date" name="start_date" required></label>
+    <label>End Date   <input type="date" name="end_date"   required></label>
+    <label>Reason
+      <textarea name="reason" rows="3" placeholder="Enter reason (required)"></textarea>
+    </label>
+    <button type="submit">Apply</button>
+  </form>
+
+  <h3>My Leave Requests</h3>
+  <div class="scroll">
+    <table>
+      <tr>
+        <th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th>
+      </tr>
+      {% for leave in leaves %}
+      <tr>
+        <td>{{ leave.type }}</td>
+        <td>{{ leave.start_date }}</td>
+        <td>{{ leave.end_date }}</td>
+        <td>{{ leave.days }}</td>
+        <td>{{ leave.reason }}</td>
+        <td><span class="status {{ leave.status }}">{{ leave.status }}</span></td>
+      </tr>
+      {% endfor %}
+      {% if not leaves %}
+      <tr><td colspan="6" style="color:#5d6878;">No requests yet.</td></tr>
+      {% endif %}
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login – ELMS</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container narrow">
+    <h2>Employee Leave Management System</h2>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+      <label>Username
+        <input type="text" name="username" required autofocus>
+      </label>
+      <label>Password
+        <input type="password" name="password" required>
+      </label>
+      <button type="submit">Login</button>
+    </form>
+    <p style="margin-top:12px;font-size:.85rem;color:#5d6878;">
+      Employees: asha / vikram &nbsp;|&nbsp; Manager: manager
+    </p>
+  </div>
+</body>
+</html>

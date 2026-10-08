@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manager Dashboard – ELMS</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <div class="container bar">
+    <strong>Manager: {{ username }}</strong>
+    <a href="/logout">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h3>All Leave Requests</h3>
+  <div class="scroll">
+    <table>
+      <tr>
+        <th>Employee</th><th>Type</th><th>From</th><th>To</th>
+        <th>Days</th><th>Reason</th><th>Status</th><th>Action</th>
+      </tr>
+      {% for leave in leaves %}
+      <tr>
+        <td>{{ leave.username }}</td>
+        <td>{{ leave.type }}</td>
+        <td>{{ leave.start_date }}</td>
+        <td>{{ leave.end_date }}</td>
+        <td>{{ leave.days }}</td>
+        <td>{{ leave.reason }}</td>
+        <td><span class="status {{ leave.status }}">{{ leave.status }}</span></td>
+        <td>
+          {% if leave.status == 'pending' %}
+          <a href="/action/{{ leave.id }}/approved">Approve</a> |
+          <a href="/action/{{ leave.id }}/rejected">Reject</a>
+          {% else %}–{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      {% if not leaves %}
+      <tr><td colspan="8" style="color:#5d6878;">No requests yet.</td></tr>
+      {% endif %}
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
